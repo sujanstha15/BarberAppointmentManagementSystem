@@ -1,5 +1,6 @@
 package com.barberappointmentmanagementsystem.entity;
 
+import com.barberappointmentmanagementsystem.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,12 +21,13 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING) //this will save the enum value as string in database
+    private Role role; //either CUSTOMER or BARBER
 }
