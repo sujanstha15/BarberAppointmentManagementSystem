@@ -1,9 +1,11 @@
 package com.barberappointmentmanagementsystem.services;
 
+import com.barberappointmentmanagementsystem.dto.LoginDTO;
 import com.barberappointmentmanagementsystem.dto.UserDTO;
 import com.barberappointmentmanagementsystem.entity.User;
 import com.barberappointmentmanagementsystem.enums.Role;
 import com.barberappointmentmanagementsystem.repositories.UserRepository;
+import com.barberappointmentmanagementsystem.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,11 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+
 
     //logic to register and save the new user
     public User registerUser(UserDTO userDTO){
@@ -38,6 +45,17 @@ public class UserService {
 
         return userRepository.save(user);
 
+    }
+
+    //logic to login by valid User
+    public String loginUser(LoginDTO loginDTO){
+        User user = userRepository.findByEmail(loginDTO.getEmail())
+                .orElseThrow(()-> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
+        return jwtUtil.generateToken(user.getEmail());
     }
 
 }
